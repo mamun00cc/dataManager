@@ -3,6 +3,11 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+// এই ব্লকটিই ম্যাজিক করবে (Force Java 17 for everything)
+kotlin {
+    jvmToolchain(17)
+}
+
 android {
     namespace = "com.root.datamanager"
     compileSdk = 34
@@ -16,13 +21,8 @@ android {
     }
 
     compileOptions {
-        // ফিক্স: VERSION_1_17 এর বদলে VERSION_17
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    
-    kotlinOptions {
-        jvmTarget = "17"
     }
 }
 
