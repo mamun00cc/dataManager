@@ -3,11 +3,6 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
-// এখানেও Toolchain যোগ করা হলো
-kotlin {
-    jvmToolchain(17)
-}
-
 android {
     namespace = "com.root.datamanager.module"
     compileSdk = 34
@@ -20,9 +15,14 @@ android {
         versionName = "1.0"
     }
     
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+    kotlin {
+        jvmToolchain(17)
+    }
+
+    packaging {
+        resources {
+            excludes += "META-INF/**" 
+        }
     }
 
     buildTypes {
@@ -35,5 +35,8 @@ android {
 
 dependencies {
     compileOnly("de.robv.android.xposed:api:82")
-    implementation("org.nanohttpd:nanohttpd:2.3.1")
+    // FTP Server Core
+    implementation("org.apache.ftpserver:ftpserver-core:1.2.0")
+    // Logging (Required by FtpServer)
+    implementation("org.slf4j:slf4j-simple:1.7.30")
 }
