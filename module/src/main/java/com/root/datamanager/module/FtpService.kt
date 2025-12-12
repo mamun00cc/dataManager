@@ -36,7 +36,6 @@ class FtpService(private val port: Int) : Thread() {
 // --- Virtual File System Classes ---
 
 class VirtualFileSystemView : FileSystemView {
-    // The root is strictly virtual
     override fun getHomeDirectory(): FtpFile = VirtualRoot()
     override fun getWorkingDirectory(): FtpFile = VirtualRoot()
     override fun changeWorkingDirectory(dir: String?): Boolean = true
@@ -52,19 +51,15 @@ class VirtualFileSystemView : FileSystemView {
 
         val pkgName = parts[0]
         
-        // If path is just /com.example, it's an App Root
         if (parts.size == 1) {
             return AppRoot(pkgName)
         }
 
-        // If path is /com.example/files/config.xml, it's a remote file
-        // We reconstruct the internal path: /files/config.xml
         val internalPath = "/" + parts.drop(1).joinToString("/")
         return RemoteFile(pkgName, internalPath, parts.last())
     }
 }
 
-// 1. Root Directory (Lists connected apps)
 class VirtualRoot : BaseFtpFile() {
     override fun getAbsolutePath() = "/"
     override fun getName() = "/"
@@ -72,12 +67,10 @@ class VirtualRoot : BaseFtpFile() {
     override fun getSize() = 0L
 
     override fun listFiles(): List<FtpFile> {
-        // Returns list of connected agents as folders
         return AgentManager.agents.keys.map { AppRoot(it) }
     }
 }
 
-// 2. App Root Directory (Represents a connected App)
 class AppRoot(private val pkg: String) : BaseFtpFile() {
     override fun getAbsolutePath() = "/$pkg"
     override fun getName() = pkg
@@ -85,12 +78,10 @@ class AppRoot(private val pkg: String) : BaseFtpFile() {
     override fun getSize() = 0L
 
     override fun listFiles(): List<FtpFile> {
-        // Send LIST command to Agent for root dir
         return fetchRemoteFiles(pkg, ".")
     }
 }
 
-// 3. Remote File/Folder (Inside the App)
 class RemoteFile(
     private val pkg: String, 
     private val path: String, 
@@ -116,7 +107,7 @@ abstract class BaseFtpFile : FtpFile {
     override fun isHidden() = false
     override fun doesExist() = true
     override fun isReadable() = true
-    override fun isWritable() = true // Allowed for UI, but logic pending
+    override fun isWritable() = true 
     override fun isRemovable() = false
     override fun getOwnerName() = "admin"
     override fun getGroupName() = "admin"
@@ -129,16 +120,17 @@ abstract class BaseFtpFile : FtpFile {
     override fun move(dest: FtpFile?) = false
     override fun setLastModified(time: Long) = false
     override fun isFile() = !isDirectory
+    
+    // **FIXED HERE:** This method was missing
+    override fun getPhysicalFile(): Any? = null
 }
 
-// Logic to parse the response from AgentClient
 fun fetchRemoteFiles(pkg: String, path: String): List<FtpFile> {
     val cmd = "LIST $path"
     val response = AgentManager.sendCommand(pkg, cmd)
     
     if (response.startsWith("Error") || response.isEmpty()) return emptyList()
 
-    // Response Format: name|isDir|size;name|isDir|size
     return response.split(";").mapNotNull { entry ->
         val parts = entry.split("|")
         if (parts.size == 3) {
@@ -146,8 +138,6 @@ fun fetchRemoteFiles(pkg: String, path: String): List<FtpFile> {
             val isDir = parts[1].toBoolean()
             val size = parts[2].toLong()
             
-            // Construct full path for the new object
-            // If path is ".", new path is "/name". Else "path/name"
             val newPath = if (path == ".") "/$name" else "$path/$name"
             
             RemoteFile(pkg, newPath, name, isDir, size)
