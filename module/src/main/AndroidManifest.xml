@@ -2,26 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.root.datamanager.module">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    
     <application
-        android:label="Data Module">
-        
+        android:label="Data Module"
+        android:hasCode="true">
+
         <meta-data
             android:name="xposedmodule"
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="Exposes internal storage via HTTP Server &amp; ContentProvider" />
+            android:value="Enables Termux Shell Access via Hub" />
         <meta-data
             android:name="xposedminversion"
             android:value="82" />
-            
-        <provider
-            android:name="com.root.datamanager.module.FileProvider"
-            android:authorities="com.target.app.provider"
-            android:exported="false" 
-            android:grantUriPermissions="true" />
-            
-    </application>
+
+        </application>
 </manifest>
