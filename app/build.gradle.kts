@@ -15,11 +15,12 @@ android {
         versionName = "1.0"
     }
 
-    // এই অংশটুকু মিসিং ছিল, যা ভার্সন ঠিক করবে
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_17
-        targetCompatibility = JavaVersion.VERSION_1_17
+        // ফিক্স: VERSION_1_17 এর বদলে VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
+    
     kotlinOptions {
         jvmTarget = "17"
     }
