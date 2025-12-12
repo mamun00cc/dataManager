@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.root.datamanager.module">
+
     <uses-permission android:name="android.permission.INTERNET" />
     
     <application
@@ -10,13 +12,13 @@
             android:value="true" />
         <meta-data
             android:name="xposeddescription"
-            android:value="Exposes internal storage via HTTP Server & ContentProvider" />
+            android:value="Exposes internal storage via HTTP Server &amp; ContentProvider" />
         <meta-data
             android:name="xposedminversion"
             android:value="82" />
             
         <provider
-            android:name=".FileProvider"
+            android:name="com.root.datamanager.module.FileProvider"
             android:authorities="com.target.app.provider"
             android:exported="false" 
             android:grantUriPermissions="true" />
